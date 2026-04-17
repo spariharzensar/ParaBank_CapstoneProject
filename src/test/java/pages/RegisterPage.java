@@ -1,7 +1,5 @@
 package pages;
 
-import base.DriverSetup;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -58,6 +56,16 @@ public class RegisterPage extends BasePage {
     @FindBy(xpath = "//div[@id='rightPanel']//p")
     WebElement textWelcomeMessage;
 
+    @FindBy(xpath = "//input[@value='Log In']")
+    WebElement buttonLogin;
+
+    @FindBy(className = "smalltext")
+    WebElement textLoginWelcome;
+
+    //_____________________________________________________________________________________________________
+
+    public static String uniqueUserName = "user_"+ System.currentTimeMillis();
+
     public void navigateToRegisterPage(){
         click(linkRegister);
     }
@@ -95,5 +103,23 @@ public class RegisterPage extends BasePage {
     public String getWelcomeText(){
         return getText(textWelcomeMessage);
     }
+
+    public boolean verifyUserIsOnLoginPage(){
+        return isElementDisplayed(inputLoginUsername);
+    }
+
+    public void enterLoginCredentials(String Uname, String UPassword){
+        enterText(inputLoginUsername, Uname);
+        enterText(inputLoginPassword, UPassword);
+    }
+
+    public void clickOnLoginButton(){
+        click(buttonLogin);
+    }
+
+    public String verifyUserLoggedInSuccessfully(){
+        return getText(textLoginWelcome);
+    }
+
 
 }
