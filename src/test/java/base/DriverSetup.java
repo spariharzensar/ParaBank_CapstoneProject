@@ -1,6 +1,7 @@
 package base;
 
 import configReader.ConfigReader;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -11,32 +12,32 @@ public class DriverSetup {
     static String expectedBrowser = ConfigReader.getProperty("browser");
 
     public static WebDriver getDriver() {
-        WebDriver wbDriver;
-        switch (expectedBrowser.toLowerCase()) {
+        if (driver.get() == null) {
 
-            case "chrome":
-                io.github.bonigarcia.wdm.WebDriverManager.chromedriver().setup();
-                wbDriver = new ChromeDriver();
-                break;
+            switch (expectedBrowser.toLowerCase()) {
 
-            case "edge":
-                io.github.bonigarcia.wdm.WebDriverManager.edgedriver().setup();
-                wbDriver = new EdgeDriver();
-                break;
+                case "chrome":
+                    WebDriverManager.chromedriver().setup();
+                    driver.set(new ChromeDriver());
+                    break;
 
-            case "firefox":
-                io.github.bonigarcia.wdm.WebDriverManager.firefoxdriver().setup();
-                wbDriver = new FirefoxDriver();
-                break;
+                case "edge":
+                    WebDriverManager.edgedriver().setup();
+                    driver.set(new EdgeDriver());
+                    break;
 
-            default:
-                throw new IllegalArgumentException("Browser not supported:"+ expectedBrowser);
+                case "firefox":
+                    WebDriverManager.firefoxdriver().setup();
+                    driver.set(new FirefoxDriver());
+                    break;
+
+                default:
+                    throw new RuntimeException("Invalid browser: " + expectedBrowser);
+            }
+
+            driver.get().manage().window().maximize();
         }
-        wbDriver.manage().window().maximize();
-        wbDriver.manage().deleteAllCookies();
-
-        driver.set(wbDriver);
 
         return driver.get();
     }
-}
+    }
