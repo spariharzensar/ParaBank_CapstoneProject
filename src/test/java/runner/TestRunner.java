@@ -4,6 +4,6 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
         features="src/test/resources/features",
-        glue= "stepDefinitions", monochrome = true)
+        glue= {"stepDefinitions","base"})
 public class TestRunner extends AbstractTestNGCucumberTests {
 }
