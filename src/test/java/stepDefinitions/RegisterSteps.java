@@ -1,12 +1,11 @@
 package stepDefinitions;
 
-import base.BaseTest;
+import configReader.ConfigReader;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 import pages.RegisterPage;
 
@@ -14,15 +13,17 @@ import java.util.Map;
 
 public class RegisterSteps {
 
-    RegisterPage registerPage;
-    String uniqueUserName = "user_"+ System.currentTimeMillis();
+    RegisterPage registerPage = new RegisterPage();
     SoftAssert softAssert = new SoftAssert();
+    String userPassword = ConfigReader.getProperty("userPassword");
 
+    //TC 01: Verify that user is able to register successfully
     @Given("user is on the registration page")
     public void userIsOnRegistrationPage() {
-        registerPage = new RegisterPage();
         registerPage.navigateToRegisterPage();
-        Assert.assertTrue(registerPage.validateUserOnRegisterPage());
+        boolean isOnPage = registerPage.validateUserOnRegisterPage();
+        softAssert.assertTrue(isOnPage, "User is NOT on registration page");
+        softAssert.assertAll();
     }
 
     @When("user enters registration details")
@@ -38,9 +39,10 @@ public class RegisterSteps {
                 data.get("zipCode"),
                 data.get("phone"),
                 data.get("ssn"),
-                uniqueUserName,
-                data.get("password")
+                RegisterPage.uniqueUserName,
+                userPassword
         );
+        System.out.println("Scenario 1:" + RegisterPage.uniqueUserName);
     }
 
     @And("clicks on register button")
@@ -54,9 +56,45 @@ public class RegisterSteps {
 
         String actualWelcomeMessage = registerPage.getUserNameWelcomeMessage();
         String actualWelcomeText = registerPage.getWelcomeText();
-        softAssert.assertTrue(actualWelcomeMessage.contains(uniqueUserName));
-        softAssert.assertEquals(actualWelcomeText, data.get("expectedWelcomeText"));
+        softAssert.assertTrue(
+                actualWelcomeMessage.contains(RegisterPage.uniqueUserName), "Username not found in welcome message"
+        );
+
+        softAssert.assertEquals(
+                actualWelcomeText.trim(),
+                data.get("expectedWelcomeText").trim(), "Welcome text mismatch"
+        );
+
         softAssert.assertAll();
     }
 
+    //TC 02: Verify that user is able to log in successfully
+    @Given("user is on the login page")
+    public void userIsOnLoginPage() {
+        boolean isOnLoginPage = registerPage.verifyUserIsOnLoginPage();
+        softAssert.assertTrue(isOnLoginPage, "User is NOT on login page");
+        softAssert.assertAll();
+    }
+
+    @When("user enters login details")
+    public void userEntersLoginDetails() {
+        System.out.println("Scenario 2:" + RegisterPage.uniqueUserName);
+        registerPage.enterLoginCredentials(RegisterPage.uniqueUserName, userPassword);
+    }
+
+    @And("clicks on login button")
+    public void clicksOnLoginButton() {
+        registerPage.clickOnLoginButton();
+    }
+
+    @Then("user should be login successfully")
+    public void userShouldBeLoginSuccess() {
+        String actualWelcomeText = registerPage.verifyUserLoggedInSuccessfully();
+        softAssert.assertEquals(
+                actualWelcomeText.trim(),
+                RegisterPage.uniqueUserName, "Logged-in username mismatch"
+        );
+
+        softAssert.assertAll();
+    }
 }

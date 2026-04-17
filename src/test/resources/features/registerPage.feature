@@ -11,7 +11,12 @@ Feature: User Registration
       | zipCode   | 10000       |
       | phone     | 1234567890  |
       | ssn       | 1234        |
-      | password  | pass123Test |
     And clicks on register button
     Then user should be registered successfully
       | expectedWelcomeText | Your account was created successfully. You are now logged in. |
+
+  Scenario: Verify that user is able to login with created user
+    Given user is on the login page
+    When user enters login details
+    And clicks on login button
+    Then user should be login successfully
